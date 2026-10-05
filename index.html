@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aplikasi SM Terpadu</title>
   
-  <!-- PWA Setup -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0d6efd">
   <link rel="apple-touch-icon" href="icon-192.png">
 
-  <!-- Libraries -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -18,25 +16,20 @@
   
   <style>
     body { background-color: #f8f9fa; padding: 20px; font-family: sans-serif; padding-bottom: 50px;}
-    .card { border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .card { border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; border: none;}
     .hidden { display: none !important; }
     
-    /* CSS Menu Modern */
-    .menu-card {
-      background: #ffffff;
-      transition: all 0.2s ease-in-out;
-      border-left: 5px solid transparent;
-    }
+    .menu-card { background: #ffffff; transition: all 0.2s ease-in-out; border-left: 5px solid transparent; border-radius: 15px !important;}
     .menu-card:active { transform: scale(0.98); background: #f8f9fa; }
+    .menu-card.dashboard { border-left-color: #6f42c1; }
     .menu-card.marketing { border-left-color: #0d6efd; }
     .menu-card.operasional { border-left-color: #ffc107; }
     .menu-card.pengembangan { border-left-color: #198754; }
     
-    .icon-box {
-      width: 50px; height: 50px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem;
-    }
+    .icon-box { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .progress { height: 12px; border-radius: 6px; background-color: #e9ecef; }
+    .kpi-title { font-size: 0.85rem; font-weight: 700; color: #495057; height: 35px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;}
+    .kpi-val { font-size: 0.8rem; }
   </style>
 </head>
 <body>
@@ -45,13 +38,25 @@
     <!-- HALAMAN PEMILIHAN MENU -->
     <div id="homeMenu" class="py-3">
       <div class="text-center mb-5 mt-3">
-        <h2 class="text-primary fw-bold mb-2">Dashboard SM/MT</h2>
-        <p class="text-muted">Pilih kategori laporan yang ingin Anda isi hari ini</p>
+        <h2 class="text-primary fw-bold mb-2">Aplikasi SM/MT</h2>
+        <p class="text-muted">Pilih menu laporan atau pantau KPI Anda</p>
       </div>
 
       <div class="d-flex flex-column gap-3">
+        <!-- MENU DASHBOARD KPI (BARU) -->
+        <button class="btn w-100 text-start p-3 shadow-sm menu-card dashboard" onclick="showDashboard()">
+          <div class="d-flex align-items-center">
+            <div class="icon-box bg-purple text-white rounded-circle me-3 shadow-sm" style="background-color: #6f42c1;"><i class="bi bi-bar-chart-line-fill"></i></div>
+            <div>
+              <h5 class="fw-bold mb-1 text-dark">Dashboard KPI SM</h5>
+              <small class="text-muted">Pantau Progres & Target Bulanan</small>
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted"></i>
+          </div>
+        </button>
+
         <!-- Menu Marketing -->
-        <button class="btn w-100 text-start p-3 shadow-sm rounded-4 menu-card marketing" onclick="showForm('sales')">
+        <button class="btn w-100 text-start p-3 shadow-sm menu-card marketing" onclick="showForm('sales')">
           <div class="d-flex align-items-center">
             <div class="icon-box bg-primary text-white rounded-circle me-3 shadow-sm"><i class="bi bi-graph-up-arrow"></i></div>
             <div>
@@ -63,7 +68,7 @@
         </button>
 
         <!-- Menu Operasional -->
-        <button class="btn w-100 text-start p-3 shadow-sm rounded-4 menu-card operasional" onclick="showForm('cogs')">
+        <button class="btn w-100 text-start p-3 shadow-sm menu-card operasional" onclick="showForm('cogs')">
           <div class="d-flex align-items-center">
             <div class="icon-box bg-warning text-dark rounded-circle me-3 shadow-sm"><i class="bi bi-box-seam"></i></div>
             <div>
@@ -75,7 +80,7 @@
         </button>
 
         <!-- Menu Pengembangan Diri -->
-        <button class="btn w-100 text-start p-3 shadow-sm rounded-4 menu-card pengembangan" onclick="showForm('pengembangan')">
+        <button class="btn w-100 text-start p-3 shadow-sm menu-card pengembangan" onclick="showForm('pengembangan')">
           <div class="d-flex align-items-center">
             <div class="icon-box bg-success text-white rounded-circle me-3 shadow-sm"><i class="bi bi-person-lines-fill"></i></div>
             <div>
@@ -88,14 +93,40 @@
       </div>
     </div>
 
-    <!-- WADAH FORM -->
+    <!-- ================= DASHBOARD KPI SECTION ================= -->
+    <div id="dashboardSection" class="hidden">
+      <button class="btn btn-sm btn-outline-secondary mb-3 shadow-sm" onclick="backToMenu()"><i class="bi bi-arrow-left"></i> Kembali ke Menu</button>
+      <h3 class="text-center mb-4 text-purple fw-bold" style="color: #6f42c1;">Dashboard Progress SM</h3>
+      
+      <div class="card p-3 bg-white mb-4">
+        <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-funnel-fill"></i> Filter Data Pegawai</h6>
+        <div class="mb-3">
+          <label class="form-label kpi-val fw-bold">Asal Store</label>
+          <select id="dashStore" class="form-select" onchange="loadDashNama()"><option value="">Loading...</option></select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label kpi-val fw-bold">Nama SM/MT</label>
+          <select id="dashNama" class="form-select" onchange="renderKPI()"><option value="">-- Pilih Store Dulu --</option></select>
+        </div>
+      </div>
+
+      <div id="kpiLoader" class="text-center hidden py-4">
+        <div class="spinner-border text-purple" style="color: #6f42c1;" role="status"></div>
+        <p class="text-muted mt-2 fw-bold">Menarik Data Terbaru dari Server...</p>
+      </div>
+
+      <div id="kpiContainer" class="row g-2 hidden">
+        <!-- Kartu KPI akan di-generate otomatis di sini oleh Javascript -->
+      </div>
+    </div>
+
+    <!-- ================= WADAH FORM PELAPORAN ================= -->
     <div id="formContainer" class="hidden">
       <button class="btn btn-sm btn-outline-secondary mb-3 shadow-sm" onclick="backToMenu()"><i class="bi bi-arrow-left"></i> Kembali ke Menu</button>
       <h3 id="formTitle" class="text-center mb-4 text-primary fw-bold">Judul Form</h3>
       
-      <div class="card p-4 shadow-sm border-0">
+      <div class="card p-4">
         <form id="unifiedForm" onsubmit="event.preventDefault(); submitData();">
-          
           <div class="mb-4">
             <label class="form-label fw-bold">Pilih Kategori</label>
             <select id="formType" name="formType" class="form-select border-primary bg-light" onchange="toggleFormSections()"></select>
@@ -119,7 +150,7 @@
                 </div>
             </div>
 
-            <!-- ================= BAGIAN SALES ================= -->
+            <!-- BAGIAN SALES -->
             <div id="sales_bigOrderFields" class="hidden form-section">
               <h5 class="text-primary fw-bold mt-4 border-bottom pb-2">Form Big Order</h5>
               <div class="mb-3"><label class="form-label">Nama Customer</label><input type="text" id="boNamaCust" name="boNamaCust" class="form-control"></div>
@@ -127,8 +158,7 @@
               <div class="mb-3">
                 <label class="form-label">Sumber Prospek</label>
                 <select id="boSumber" name="boSumber" class="form-select" onchange="toggleLainnya('boSumber', 'boSumberLainDiv')">
-                  <option value="OOTB">OOTB</option><option value="Japri">Japri</option>
-                  <option value="Relasi">Relasi</option><option value="Event">Event</option><option value="Lainnya">Lainnya</option>
+                  <option value="OOTB">OOTB</option><option value="Japri">Japri</option><option value="Relasi">Relasi</option><option value="Event">Event</option><option value="Lainnya">Lainnya</option>
                 </select>
               </div>
               <div class="mb-3 hidden" id="boSumberLainDiv"><input type="text" id="boSumberLain" name="boSumberLain" class="form-control" placeholder="Tulis sumber prospek..."></div>
@@ -145,8 +175,7 @@
               <div class="mb-3">
                 <label class="form-label">Jenis Event</label>
                 <select id="evJenis" name="evJenis" class="form-select" onchange="toggleLainnya('evJenis', 'evJenisLainDiv')">
-                  <option value="Cooking Class">Cooking Class</option><option value="Jalan Sehat">Jalan Sehat</option>
-                  <option value="Karnaval">Karnaval</option><option value="Pengajian">Pengajian</option><option value="Acara Desa">Acara Desa</option><option value="Lainnya">Lainnya</option>
+                  <option value="Cooking Class">Cooking Class</option><option value="Jalan Sehat">Jalan Sehat</option><option value="Karnaval">Karnaval</option><option value="Pengajian">Pengajian</option><option value="Acara Desa">Acara Desa</option><option value="Lainnya">Lainnya</option>
                 </select>
               </div>
               <div class="mb-3 hidden" id="evJenisLainDiv"><input type="text" id="evJenisLain" name="evJenisLain" class="form-control" placeholder="Tulis jenis event..."></div>
@@ -157,7 +186,7 @@
               <div class="mb-3"><label class="form-label">Pesan Event Untuk ?</label><input type="text" id="evPic" name="evPic" class="form-control"></div>
             </div>
 
-            <!-- ================= BAGIAN COGS ================= -->
+            <!-- BAGIAN COGS -->
             <div id="cogs_cogsFields" class="hidden form-section">
               <h5 class="text-primary fw-bold mt-4 border-bottom pb-2">Melakukan Review COGS</h5>
               <div class="mb-3"><label class="form-label">COGS Sekarang (% / Angka)</label><input type="text" id="cogsSekarang" name="cogsSekarang" class="form-control"></div>
@@ -184,25 +213,13 @@
               <div class="mb-3"><label class="form-label text-danger fw-bold">Foto Bukti Tindakan (WAJIB)</label><input type="file" id="fotoOpname" class="form-control file-input" accept="image/*"></div>
             </div>
 
-            <!-- ================= BAGIAN PENGEMBANGAN DIRI ================= -->
+            <!-- BAGIAN PENGEMBANGAN DIRI -->
             <div id="pengembangan_fields" class="hidden form-section">
               <h5 class="text-primary fw-bold mt-4 border-bottom pb-2">Laporan Pelatihan</h5>
-              <div class="mb-3">
-                <label class="form-label">Training SOP Apa</label>
-                <input type="text" id="trainingSop" name="trainingSop" class="form-control">
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Training Siapa</label>
-                <input type="text" id="trainingSiapa" name="trainingSiapa" class="form-control" placeholder="Nama / Jabatan peserta">
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Hasil Training</label>
-                <textarea id="hasilTraining" name="hasilTraining" class="form-control" rows="3"></textarea>
-              </div>
-              <div class="mb-3">
-                <label class="form-label text-danger fw-bold">Foto Pelaksanaan (WAJIB)</label>
-                <input type="file" id="fotoPengembangan" class="form-control file-input" accept="image/*">
-              </div>
+              <div class="mb-3"><label class="form-label">Training SOP Apa</label><input type="text" id="trainingSop" name="trainingSop" class="form-control"></div>
+              <div class="mb-3"><label class="form-label">Training Siapa</label><input type="text" id="trainingSiapa" name="trainingSiapa" class="form-control" placeholder="Nama / Jabatan peserta"></div>
+              <div class="mb-3"><label class="form-label">Hasil Training</label><textarea id="hasilTraining" name="hasilTraining" class="form-control" rows="3"></textarea></div>
+              <div class="mb-3"><label class="form-label text-danger fw-bold">Foto Pelaksanaan (WAJIB)</label><input type="file" id="fotoPengembangan" class="form-control file-input" accept="image/*"></div>
             </div>
 
             <button type="submit" class="btn btn-primary w-100 mt-4 py-3 fw-bold rounded-3 shadow-sm"><i class="bi bi-send-fill me-2"></i> SIMPAN DATA</button>
@@ -225,8 +242,10 @@
     // ===========================================
     
     let rawData = [];
+    let kpiDataRaw = null;
     let currentCategory = ""; 
 
+    // LOAD DATA SAAT AWAL BUKA
     window.onload = async function() {
       try {
         const response = await fetch(`${SCRIPT_URL}?action=getDropdown`);
@@ -234,16 +253,128 @@
         if(result.status === 'success') {
           rawData = result.data;
           let stores = [...new Set(rawData.map(row => row[0]))];
-          let storeDropdown = document.getElementById('store');
-          storeDropdown.innerHTML = '<option value="">-- Pilih Asal Store --</option>';
-          stores.forEach(store => storeDropdown.innerHTML += `<option value="${store}">${store}</option>`);
+          let storeHTML = '<option value="">-- Pilih Asal Store --</option>';
+          stores.forEach(store => storeHTML += `<option value="${store}">${store}</option>`);
+          
+          document.getElementById('store').innerHTML = storeHTML;
+          document.getElementById('dashStore').innerHTML = storeHTML;
         }
-      } catch(err) { console.error(err); }
+      } catch(err) { console.error("Gagal load dropdown", err); }
     };
 
+    /* =======================================================
+       LOGIKA DASHBOARD KPI BARU
+       ======================================================= */
+    async function showDashboard() {
+      document.getElementById('homeMenu').classList.add('hidden');
+      document.getElementById('formContainer').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.remove('hidden');
+
+      if (!kpiDataRaw) {
+        document.getElementById('kpiLoader').classList.remove('hidden');
+        document.getElementById('kpiContainer').classList.add('hidden');
+        try {
+          const response = await fetch(`${SCRIPT_URL}?action=getKpiData`);
+          const result = await response.json();
+          if(result.status === 'success') {
+            kpiDataRaw = result.data;
+          }
+        } catch(err) { 
+          Swal.fire('Error', 'Gagal menarik data Dashboard KPI.', 'error');
+        }
+        document.getElementById('kpiLoader').classList.add('hidden');
+        document.getElementById('kpiContainer').classList.remove('hidden');
+      }
+    }
+
+    function loadDashNama() {
+      let store = document.getElementById('dashStore').value;
+      let namaDrop = document.getElementById('dashNama');
+      namaDrop.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      document.getElementById('kpiContainer').innerHTML = ""; // Bersihkan KPI sebelumnya
+      
+      rawData.filter(row => row[0] === store).forEach(row => {
+        namaDrop.innerHTML += `<option value="${row[1]}">${row[1]}</option>`;
+      });
+    }
+
+    // Fungsi Mengonversi String "Rp20.000.000" atau "10%" Menjadi Angka Murni untuk Kalkulasi
+    function parseNumber(val) {
+      if (val === "" || val === null || val === undefined) return 0;
+      if (typeof val === 'number') return val;
+      let str = val.toString().replace(/Rp|\./g, '').replace(',', '.').replace('%', '').trim();
+      let num = parseFloat(str);
+      return isNaN(num) ? 0 : num;
+    }
+
+    function renderKPI() {
+      let selectedNama = document.getElementById('dashNama').value;
+      let container = document.getElementById('kpiContainer');
+      container.innerHTML = "";
+
+      if (!selectedNama || !kpiDataRaw) return;
+
+      // Cari Data SM di array Users (Nama ada di index 0 karena range mulai dari B)
+      let userData = kpiDataRaw.users.find(row => row[0] === selectedNama);
+      
+      if (!userData) {
+        container.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">Data pencapaian belum tersedia untuk SM ini.</div></div>`;
+        return;
+      }
+
+      // Loop melalui setiap kolom KPI (Mulai index 1 agar 'Nama' dilewati)
+      for (let i = 1; i < kpiDataRaw.headers.length; i++) {
+        let title = kpiDataRaw.headers[i];
+        let targetText = kpiDataRaw.targets[i];
+        let achieveText = userData[i];
+        
+        if (!title) continue; // Skip jika header kosong
+
+        let targetNum = parseNumber(targetText);
+        let achieveNum = parseNumber(achieveText);
+        let percentage = 0;
+
+        // Aturan Khusus: Jika target 0 (seperti komplain), maka jika 0 tercapai = 100%, jika > 0 = 0%
+        if (targetNum === 0 && title.toLowerCase().includes("zero")) {
+          percentage = (achieveNum <= 0) ? 100 : 0;
+        } else if (targetNum > 0) {
+          percentage = (achieveNum / targetNum) * 100;
+        }
+
+        if (percentage > 100) percentage = 100; // Cap visual bar di 100%
+        if (percentage < 0) percentage = 0;
+
+        // Penentuan Warna Progress Bar
+        let colorClass = "bg-danger";
+        if (percentage >= 80) colorClass = "bg-success";
+        else if (percentage >= 50) colorClass = "bg-warning";
+
+        // Template HTML untuk setiap Card KPI
+        let cardHTML = `
+          <div class="col-6 col-md-4">
+            <div class="card p-3 h-100 border-0 shadow-sm" style="border: 1px solid #f1f3f5;">
+              <div class="kpi-title mb-2">${title}</div>
+              <div class="d-flex justify-content-between kpi-val mb-2">
+                <span class="fw-bold text-dark">${achieveText || '0'}</span>
+                <span class="text-muted">Target: ${targetText || '0'}</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated ${colorClass}" role="progressbar" style="width: ${percentage}%"></div>
+              </div>
+            </div>
+          </div>
+        `;
+        container.innerHTML += cardHTML;
+      }
+    }
+
+    /* =======================================================
+       LOGIKA FORM & LAINNYA
+       ======================================================= */
     function showForm(category) {
       currentCategory = category;
       document.getElementById('homeMenu').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.add('hidden');
       document.getElementById('formContainer').classList.remove('hidden');
       
       let formTypeSelect = document.getElementById('formType');
@@ -266,6 +397,7 @@
 
     function backToMenu() {
       document.getElementById('formContainer').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.add('hidden');
       document.getElementById('homeMenu').classList.remove('hidden');
       document.getElementById('unifiedForm').reset();
     }
@@ -303,7 +435,6 @@
       document.getElementById(divId).classList.toggle('hidden', val !== "Lainnya");
     }
 
-    // Kompresi Gambar
     async function fileToBase64(file) {
       if(!file) return null;
       const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
@@ -333,8 +464,6 @@
       }
 
       let filesToUpload = {};
-      
-      // Validasi Foto WAJIB untuk COGS dan PENGEMBANGAN
       if (currentCategory === 'cogs' || currentCategory === 'pengembangan') {
         let fileInput;
         if (currentCategory === 'pengembangan') fileInput = document.getElementById('fotoPengembangan').files[0];
@@ -342,14 +471,10 @@
         else if (type === 'Pengendalian Waste') fileInput = document.getElementById('fotoWaste').files[0];
         else fileInput = document.getElementById('fotoOpname').files[0];
 
-        if (!fileInput) {
-          Swal.fire('Peringatan', 'Foto Bukti WAJIB dilampirkan!', 'error');
-          return;
-        }
+        if (!fileInput) { Swal.fire('Peringatan', 'Foto Bukti WAJIB dilampirkan!', 'error'); return; }
         let fData = await fileToBase64(fileInput);
         filesToUpload = { fileBase64: fData.base64, fileName: fData.name, fileMime: fData.mime };
       } 
-      // Foto Opsi Ganda untuk SALES
       else {
         let file1 = type === 'Big Order' ? document.getElementById('boFile1').files[0] : document.getElementById('evFile1').files[0];
         let file2 = type === 'Big Order' ? document.getElementById('boFile2').files[0] : document.getElementById('evFile2').files[0];
@@ -361,10 +486,7 @@
         };
       }
 
-      Swal.fire({
-        title: 'Mengirim Laporan...', text: 'Mohon tunggu, memproses ke server.',
-        allowOutsideClick: false, didOpen: () => { Swal.showLoading() }
-      });
+      Swal.fire({ title: 'Mengirim Laporan...', text: 'Mohon tunggu, memproses ke server.', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
 
       const formData = new FormData(document.getElementById('unifiedForm'));
       const dataObj = Object.fromEntries(formData.entries());
@@ -372,16 +494,12 @@
 
       try {
         const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payloadData),
+          method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payloadData),
         });
         const result = await response.json();
         if(result.status === 'success') handleSuccess(result);
         else Swal.fire('Gagal', 'Sistem Gagal: ' + result.message, 'error');
-      } catch (err) {
-        Swal.fire('Error', 'Gagal menghubungi server.', 'error');
-      }
+      } catch (err) { Swal.fire('Error', 'Gagal menghubungi server.', 'error'); }
     }
 
     function handleSuccess(response) {
@@ -402,12 +520,8 @@
       let waText = `*REPORT PROGRESS SALES SM*\n\n*Tipe:* ${response.type}\n*Store:* ${d.store}\n*Nama:* ${d.nama}\n*Jabatan:* ${d.jabatan}\n\n`;
       let l1 = response.urlBukti1 ? `\n*Link Bukti 1:* ${response.urlBukti1}` : "";
       let l2 = response.urlBukti2 ? `\n*Link Bukti 2:* ${response.urlBukti2}` : "";
-
-      if(response.type === 'Big Order') {
-        waText += `*Nama Customer:* ${d.boNamaCust}\n*WA Customer:* ${d.boWaCust}\n*Sumber:* ${response.detail1}\n*Tanggal:* ${response.dateBO}\n*Pesanan:* ${d.boPesanan}\n*Pesan Untuk:* ${d.boPic}\n${l1}${l2}`;
-      } else {
-        waText += `*Instansi:* ${d.evInstansi}\n*Jenis:* ${response.detail1}\n*Peserta:* ${d.evPeserta}\n*Sales:* Rp ${d.evSales}\n*Pesan Untuk:* ${d.evPic}\n${l1}${l2}`;
-      }
+      if(response.type === 'Big Order') waText += `*Nama Customer:* ${d.boNamaCust}\n*WA Customer:* ${d.boWaCust}\n*Sumber:* ${response.detail1}\n*Tanggal:* ${response.dateBO}\n*Pesanan:* ${d.boPesanan}\n*Pesan Untuk:* ${d.boPic}\n${l1}${l2}`;
+      else waText += `*Instansi:* ${d.evInstansi}\n*Jenis:* ${response.detail1}\n*Peserta:* ${d.evPeserta}\n*Sales:* Rp ${d.evSales}\n*Pesan Untuk:* ${d.evPic}\n${l1}${l2}`;
       return waText;
     }
 
@@ -417,21 +531,18 @@
       if (d.formType === 'Pengendalian Cogs') waText += `*COGS Sekarang:* ${d.cogsSekarang}\n*GAP COGS Actual:* ${d.gapCogs}\n*Penyebab COGS > 55%:*\n${d.penyebabCogs}\n\n*Tindakan Perbaikan:*\n${d.tindakanCogs}`;
       else if (d.formType === 'Pengendalian Waste') waText += `*Waste vs Sales:* ${d.persenWaste}\n*Waste Terbesar:* ${d.wasteBesar}\n*Sebab Utama:*\n${d.sebabWaste}\n\n*Tindakan Perbaikan:*\n${d.tindakanWaste}`;
       else waText += `*Selisih SO:* ${d.persenSelisih}\n*Penyebab Selisih:*\n${d.sebabSelisih}\n\n*Tindakan Perbaikan:*\n${d.tindakanOpname}`;
-      
       if(response.urlFoto) waText += `\n\n*Link Bukti:* ${response.urlFoto}`;
       return waText;
     }
 
     function generateWaPengembangan(response) {
       let d = response.data;
-      let waText = `*REPORT PENGEMBANGAN DIRI*\n\n*Asal Store:* ${d.store}\n*Nama:* ${d.nama}\n*Jabatan:* ${d.jabatan}\n\n`;
-      waText += `*Training SOP:* ${d.trainingSop}\n*Training Siapa:* ${d.trainingSiapa}\n*Hasil Training:*\n${d.hasilTraining}`;
+      let waText = `*REPORT PENGEMBANGAN DIRI*\n\n*Asal Store:* ${d.store}\n*Nama:* ${d.nama}\n*Jabatan:* ${d.jabatan}\n\n*Training SOP:* ${d.trainingSop}\n*Training Siapa:* ${d.trainingSiapa}\n*Hasil Training:*\n${d.hasilTraining}`;
       if (response.urlFoto) waText += `\n\n*Link Bukti:* ${response.urlFoto}`;
       return waText;
     }
   </script>
 
-  <!-- Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.error(err)); });
