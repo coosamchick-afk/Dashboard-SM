@@ -5,39 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aplikasi SM Terpadu</title>
   
-  <!-- Tambahkan 3 baris ini untuk PWA -->
-  <link rel="manifest" href="./manifest.json">
+  <!-- PWA Setup -->
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0d6efd">
-  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Libraries -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
+  
   <style>
-    body { background-color: #f8f9fa; padding: 20px; font-family: sans-serif;}
+    body { background-color: #f8f9fa; padding: 20px; font-family: sans-serif; padding-bottom: 50px;}
     .card { border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
     .hidden { display: none !important; }
-    .menu-btn { height: 100px; font-size: 1.2rem; font-weight: bold; border-radius: 15px; }
+    
+    /* CSS Menu Modern */
     .menu-card {
-  background: #ffffff;
-  transition: all 0.2s ease-in-out;
-  border-left: 5px solid transparent;
-}
-.menu-card:active {
-  transform: scale(0.98);
-  background: #f8f9fa;
-}
-.menu-card.marketing { border-left-color: #0d6efd; }
-.menu-card.operasional { border-left-color: #ffc107; }
-.icon-box {
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-}
+      background: #ffffff;
+      transition: all 0.2s ease-in-out;
+      border-left: 5px solid transparent;
+    }
+    .menu-card:active { transform: scale(0.98); background: #f8f9fa; }
+    .menu-card.marketing { border-left-color: #0d6efd; }
+    .menu-card.operasional { border-left-color: #ffc107; }
+    .menu-card.pengembangan { border-left-color: #198754; }
+    
+    .icon-box {
+      width: 50px; height: 50px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+    }
   </style>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
   <div class="container mx-auto" style="max-width: 650px;">
@@ -53,9 +53,7 @@
         <!-- Menu Marketing -->
         <button class="btn w-100 text-start p-3 shadow-sm rounded-4 menu-card marketing" onclick="showForm('sales')">
           <div class="d-flex align-items-center">
-            <div class="icon-box bg-primary text-white rounded-circle me-3 shadow-sm">
-              <i class="bi bi-graph-up-arrow"></i>
-            </div>
+            <div class="icon-box bg-primary text-white rounded-circle me-3 shadow-sm"><i class="bi bi-graph-up-arrow"></i></div>
             <div>
               <h5 class="fw-bold mb-1 text-dark">Progress Marketing</h5>
               <small class="text-muted">Laporan Big Order & Event</small>
@@ -67,12 +65,22 @@
         <!-- Menu Operasional -->
         <button class="btn w-100 text-start p-3 shadow-sm rounded-4 menu-card operasional" onclick="showForm('cogs')">
           <div class="d-flex align-items-center">
-            <div class="icon-box bg-warning text-dark rounded-circle me-3 shadow-sm">
-              <i class="bi bi-box-seam"></i>
-            </div>
+            <div class="icon-box bg-warning text-dark rounded-circle me-3 shadow-sm"><i class="bi bi-box-seam"></i></div>
             <div>
               <h5 class="fw-bold mb-1 text-dark">Progress Operasional</h5>
               <small class="text-muted">Laporan COGS, Waste & Stock Opname</small>
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted"></i>
+          </div>
+        </button>
+
+        <!-- Menu Pengembangan Diri -->
+        <button class="btn w-100 text-start p-3 shadow-sm rounded-4 menu-card pengembangan" onclick="showForm('pengembangan')">
+          <div class="d-flex align-items-center">
+            <div class="icon-box bg-success text-white rounded-circle me-3 shadow-sm"><i class="bi bi-person-lines-fill"></i></div>
+            <div>
+              <h5 class="fw-bold mb-1 text-dark">Pengembangan Diri</h5>
+              <small class="text-muted">Laporan Pelatihan & SOP</small>
             </div>
             <i class="bi bi-chevron-right ms-auto text-muted"></i>
           </div>
@@ -82,24 +90,21 @@
 
     <!-- WADAH FORM -->
     <div id="formContainer" class="hidden">
-      <button class="btn btn-sm btn-outline-secondary mb-3" onclick="backToMenu()">⬅ Kembali ke Menu</button>
+      <button class="btn btn-sm btn-outline-secondary mb-3 shadow-sm" onclick="backToMenu()"><i class="bi bi-arrow-left"></i> Kembali ke Menu</button>
       <h3 id="formTitle" class="text-center mb-4 text-primary fw-bold">Judul Form</h3>
       
-      <div class="card p-4 shadow-sm">
+      <div class="card p-4 shadow-sm border-0">
         <form id="unifiedForm" onsubmit="event.preventDefault(); submitData();">
           
-          <!-- Dropdown Tipe Form -->
-          <div class="mb-3">
-            <label class="form-label fw-bold" id="labelFormType">Pilih Kategori</label>
-            <select id="formType" name="formType" class="form-select border-primary" onchange="toggleFormSections()">
-              <!-- Options diisi via JS -->
-            </select>
+          <div class="mb-4">
+            <label class="form-label fw-bold">Pilih Kategori</label>
+            <select id="formType" name="formType" class="form-select border-primary bg-light" onchange="toggleFormSections()"></select>
           </div>
 
           <div id="mainFormFields" class="hidden">
-            <!-- IDENTITAS DINAMIS UMUM (Dipakai oleh kedua form) -->
-            <div class="p-3 bg-light rounded border mb-3">
-                <h6 class="fw-bold mb-3">Data Pegawai</h6>
+            <!-- IDENTITAS DINAMIS UMUM -->
+            <div class="p-3 bg-light rounded border mb-4 shadow-sm">
+                <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-person-badge"></i> Data Pegawai</h6>
                 <div class="mb-3">
                   <label class="form-label">Asal Store</label>
                   <select id="store" name="store" class="form-select" onchange="loadNama()"><option value="">Loading...</option></select>
@@ -108,15 +113,14 @@
                   <label class="form-label">Nama</label>
                   <select id="nama" name="nama" class="form-select" onchange="loadJabatan()"><option value="">-- Pilih Store Dulu --</option></select>
                 </div>
-                <div class="mb-3">
+                <div class="mb-2">
                   <label class="form-label">Jabatan</label>
                   <input type="text" id="jabatan" name="jabatan" class="form-control bg-white" readonly>
                 </div>
             </div>
 
-            <!-- ===================== BAGIAN SALES ===================== -->
-            <!-- FORM BIG ORDER -->
-            <div id="sales_bigOrderFields" class="hidden form-section sales-section">
+            <!-- ================= BAGIAN SALES ================= -->
+            <div id="sales_bigOrderFields" class="hidden form-section">
               <h5 class="text-primary fw-bold mt-4 border-bottom pb-2">Form Big Order</h5>
               <div class="mb-3"><label class="form-label">Nama Customer</label><input type="text" id="boNamaCust" name="boNamaCust" class="form-control"></div>
               <div class="mb-3"><label class="form-label">WA Customer</label><input type="number" id="boWaCust" name="boWaCust" class="form-control"></div>
@@ -132,19 +136,17 @@
               <div class="mb-3"><label class="form-label">Pesanan Customer</label><textarea id="boPesanan" name="boPesanan" class="form-control" rows="2"></textarea></div>
               <div class="mb-3"><label class="form-label">Bukti Chat/Dokumentasi</label><input type="file" id="boFile1" class="form-control file-input" accept="image/*"></div>
               <div class="mb-3"><label class="form-label">Foto Nota</label><input type="file" id="boFile2" class="form-control file-input" accept="image/*"></div>
-              <div class="mb-3"><label class="form-label">Big Order Untuk Apa?</label><input type="text" id="boPic" name="boPic" class="form-control"></div>
+              <div class="mb-3"><label class="form-label">Pesan Big Order Untuk ?</label><input type="text" id="boPic" name="boPic" class="form-control"></div>
             </div>
 
-            <!-- FORM EVENT -->
-            <div id="sales_eventFields" class="hidden form-section sales-section">
+            <div id="sales_eventFields" class="hidden form-section">
               <h5 class="text-primary fw-bold mt-4 border-bottom pb-2">Form Event</h5>
               <div class="mb-3"><label class="form-label">Nama Instansi</label><input type="text" id="evInstansi" name="evInstansi" class="form-control"></div>
               <div class="mb-3">
                 <label class="form-label">Jenis Event</label>
                 <select id="evJenis" name="evJenis" class="form-select" onchange="toggleLainnya('evJenis', 'evJenisLainDiv')">
                   <option value="Cooking Class">Cooking Class</option><option value="Jalan Sehat">Jalan Sehat</option>
-                  <option value="Karnaval">Karnaval</option><option value="Pengajian">Pengajian</option>
-                  <option value="Acara Desa">Acara Desa</option><option value="Lainnya">Lainnya</option>
+                  <option value="Karnaval">Karnaval</option><option value="Pengajian">Pengajian</option><option value="Acara Desa">Acara Desa</option><option value="Lainnya">Lainnya</option>
                 </select>
               </div>
               <div class="mb-3 hidden" id="evJenisLainDiv"><input type="text" id="evJenisLain" name="evJenisLain" class="form-control" placeholder="Tulis jenis event..."></div>
@@ -152,63 +154,79 @@
               <div class="mb-3"><label class="form-label">Sales Event (Rp)</label><input type="text" id="evSales" name="evSales" class="form-control"></div>
               <div class="mb-3"><label class="form-label">Foto Nota</label><input type="file" id="evFile1" class="form-control file-input" accept="image/*"></div>
               <div class="mb-3"><label class="form-label">Foto Bukti Pelaksanaan</label><input type="file" id="evFile2" class="form-control file-input" accept="image/*"></div>
-              <div class="mb-3"><label class="form-label">PIC SM yang mendapatkan</label><input type="text" id="evPic" name="evPic" class="form-control"></div>
+              <div class="mb-3"><label class="form-label">Pesan Event Untuk ?</label><input type="text" id="evPic" name="evPic" class="form-control"></div>
             </div>
 
-            <!-- ===================== BAGIAN COGS ===================== -->
-            <!-- FORM PENGENDALIAN COGS -->
-            <div id="cogs_cogsFields" class="hidden form-section cogs-section">
+            <!-- ================= BAGIAN COGS ================= -->
+            <div id="cogs_cogsFields" class="hidden form-section">
               <h5 class="text-primary fw-bold mt-4 border-bottom pb-2">Melakukan Review COGS</h5>
               <div class="mb-3"><label class="form-label">COGS Sekarang (% / Angka)</label><input type="text" id="cogsSekarang" name="cogsSekarang" class="form-control"></div>
               <div class="mb-3"><label class="form-label">Berapa GAP % COGS Target dengan Actual</label><input type="text" id="gapCogs" name="gapCogs" class="form-control"></div>
-              <div class="mb-3"><label class="form-label">Jika COGS sekarang lebih dari 55% apa penyebabnya</label><textarea id="penyebabCogs" name="penyebabCogs" class="form-control" rows="3"></textarea></div>
+              <div class="mb-3"><label class="form-label">Jika COGS > 55% apa penyebabnya</label><textarea id="penyebabCogs" name="penyebabCogs" class="form-control" rows="3"></textarea></div>
               <div class="mb-3"><label class="form-label">Tindakan Perbaikan yang dilakukan</label><textarea id="tindakanCogs" name="tindakanCogs" class="form-control" rows="3"></textarea></div>
-              <div class="mb-3"><label class="form-label text-danger fw-bold">Foto Bukti Tindakan Perbaikan (WAJIB)</label><input type="file" id="fotoCogs" class="form-control file-input" accept="image/*"></div>
+              <div class="mb-3"><label class="form-label text-danger fw-bold">Foto Bukti Tindakan (WAJIB)</label><input type="file" id="fotoCogs" class="form-control file-input" accept="image/*"></div>
             </div>
 
-            <!-- FORM PENGENDALIAN WASTE -->
-            <div id="cogs_wasteFields" class="hidden form-section cogs-section">
+            <div id="cogs_wasteFields" class="hidden form-section">
               <h5 class="text-primary fw-bold mt-4 border-bottom pb-2">Pengendalian Waste</h5>
-              <div class="mb-3"><label class="form-label">Berapa persentase nilai waste dibanding sales?</label><input type="text" id="persenWaste" name="persenWaste" class="form-control"></div>
+              <div class="mb-3"><label class="form-label">Persentase waste dibanding sales?</label><input type="text" id="persenWaste" name="persenWaste" class="form-control"></div>
               <div class="mb-3"><label class="form-label">Apa waste yang paling besar?</label><input type="text" id="wasteBesar" name="wasteBesar" class="form-control"></div>
               <div class="mb-3"><label class="form-label">Apa sebab utama waste?</label><textarea id="sebabWaste" name="sebabWaste" class="form-control" rows="3"></textarea></div>
               <div class="mb-3"><label class="form-label">Tindakan apa yang sudah dilakukan?</label><textarea id="tindakanWaste" name="tindakanWaste" class="form-control" rows="3"></textarea></div>
-              <div class="mb-3"><label class="form-label text-danger fw-bold">Foto Bukti Tindakan yang Sudah Dilakukan (WAJIB)</label><input type="file" id="fotoWaste" class="form-control file-input" accept="image/*"></div>
+              <div class="mb-3"><label class="form-label text-danger fw-bold">Foto Bukti Tindakan (WAJIB)</label><input type="file" id="fotoWaste" class="form-control file-input" accept="image/*"></div>
             </div>
 
-            <!-- FORM PENGENDALIAN STOK OPNAME -->
-            <div id="cogs_soFields" class="hidden form-section cogs-section">
+            <div id="cogs_soFields" class="hidden form-section">
               <h5 class="text-primary fw-bold mt-4 border-bottom pb-2">Pengendalian Stock Opname</h5>
-              <div class="mb-3"><label class="form-label">Berapa persentase selisih stok opname?</label><input type="text" id="persenSelisih" name="persenSelisih" class="form-control"></div>
+              <div class="mb-3"><label class="form-label">Persentase selisih stok opname?</label><input type="text" id="persenSelisih" name="persenSelisih" class="form-control"></div>
               <div class="mb-3"><label class="form-label">Apa penyebab stock opname selisih?</label><textarea id="sebabSelisih" name="sebabSelisih" class="form-control" rows="3"></textarea></div>
               <div class="mb-3"><label class="form-label">Tindakan apa yang sudah dilakukan?</label><textarea id="tindakanOpname" name="tindakanOpname" class="form-control" rows="3"></textarea></div>
-              <div class="mb-3"><label class="form-label text-danger fw-bold">Foto Bukti Pelaksanaan Tindakan (WAJIB)</label><input type="file" id="fotoOpname" class="form-control file-input" accept="image/*"></div>
+              <div class="mb-3"><label class="form-label text-danger fw-bold">Foto Bukti Tindakan (WAJIB)</label><input type="file" id="fotoOpname" class="form-control file-input" accept="image/*"></div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 mt-4 py-2 fw-bold">SIMPAN DATA</button>
+            <!-- ================= BAGIAN PENGEMBANGAN DIRI ================= -->
+            <div id="pengembangan_fields" class="hidden form-section">
+              <h5 class="text-primary fw-bold mt-4 border-bottom pb-2">Laporan Pelatihan</h5>
+              <div class="mb-3">
+                <label class="form-label">Training SOP Apa</label>
+                <input type="text" id="trainingSop" name="trainingSop" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Training Siapa</label>
+                <input type="text" id="trainingSiapa" name="trainingSiapa" class="form-control" placeholder="Nama / Jabatan peserta">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Hasil Training</label>
+                <textarea id="hasilTraining" name="hasilTraining" class="form-control" rows="3"></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-danger fw-bold">Foto Pelaksanaan (WAJIB)</label>
+                <input type="file" id="fotoPengembangan" class="form-control file-input" accept="image/*">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mt-4 py-3 fw-bold rounded-3 shadow-sm"><i class="bi bi-send-fill me-2"></i> SIMPAN DATA</button>
           </div>
         </form>
 
-        <div id="shareSection" class="hidden mt-4 text-center p-3 border rounded bg-light">
-          <h5 class="text-success fw-bold mb-3">✅ Data Berhasil Disimpan</h5>
-          <a id="btnShareWa" href="#" target="_blank" class="btn btn-success w-100 fw-bold py-2 mb-2">Kirim Laporan ke WhatsApp</a>
-          <button class="btn btn-outline-secondary w-100" onclick="location.reload()">Kembali ke Awal</button>
+        <div id="shareSection" class="hidden mt-4 text-center p-4 border rounded-4 bg-light shadow-sm">
+          <div class="icon-box bg-success text-white rounded-circle mx-auto mb-3 shadow-sm"><i class="bi bi-check-lg"></i></div>
+          <h5 class="text-success fw-bold mb-3">Data Berhasil Disimpan</h5>
+          <a id="btnShareWa" href="#" target="_blank" class="btn btn-success w-100 fw-bold py-3 mb-2 rounded-3 shadow-sm"><i class="bi bi-whatsapp me-2"></i> Kirim Format ke WA</a>
+          <button class="btn btn-outline-secondary w-100 py-2 rounded-3" onclick="location.reload()">Kembali ke Awal</button>
         </div>
       </div>
     </div>
-
   </div>
 
   <script>
-    // ====== KONFIGURASI PENTING ======
-    // GANTI URL DI BAWAH DENGAN WEB APP URL ANDA DARI APPS SCRIPT
+    // ====== GANTI DENGAN URL WEB APP ANDA ======
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZdKq8rrgp0wks5HYmlT1KefrRXgMEVF2RUMv4AhJMi49QJgXcLjaR5gll6mK6wsMe/exec"; 
-    // =================================
+    // ===========================================
     
     let rawData = [];
-    let currentCategory = ""; // 'sales' atau 'cogs'
+    let currentCategory = ""; 
 
-    // Ambil Data Pegawai Saat Halaman Dimuat
     window.onload = async function() {
       try {
         const response = await fetch(`${SCRIPT_URL}?action=getDropdown`);
@@ -218,13 +236,9 @@
           let stores = [...new Set(rawData.map(row => row[0]))];
           let storeDropdown = document.getElementById('store');
           storeDropdown.innerHTML = '<option value="">-- Pilih Asal Store --</option>';
-          stores.forEach(store => {
-            storeDropdown.innerHTML += `<option value="${store}">${store}</option>`;
-          });
+          stores.forEach(store => storeDropdown.innerHTML += `<option value="${store}">${store}</option>`);
         }
-      } catch(err) {
-        console.error("Gagal mengambil data pegawai", err);
-      }
+      } catch(err) { console.error(err); }
     };
 
     function showForm(category) {
@@ -233,17 +247,19 @@
       document.getElementById('formContainer').classList.remove('hidden');
       
       let formTypeSelect = document.getElementById('formType');
-      formTypeSelect.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+      formTypeSelect.innerHTML = '<option value="">-- Pilih Kategori Form --</option>';
 
-      if(category === 'sales') {
+      if (category === 'sales') {
         document.getElementById('formTitle').innerText = "Report Progress Sales SM";
         formTypeSelect.innerHTML += '<option value="Big Order">Big Order</option><option value="Event">Event</option>';
-      } else {
-        document.getElementById('formTitle').innerText = "Report Progress COGS Terkendali";
+      } else if (category === 'cogs') {
+        document.getElementById('formTitle').innerText = "Report Progress Operasional";
         formTypeSelect.innerHTML += '<option value="Pengendalian Cogs">Pengendalian Cogs</option><option value="Pengendalian Waste">Pengendalian Waste</option><option value="Pengendalian Stok Opname">Pengendalian Stok Opname</option>';
+      } else if (category === 'pengembangan') {
+        document.getElementById('formTitle').innerText = "Report Pengembangan Diri";
+        formTypeSelect.innerHTML += '<option value="Pelatihan / Training">Pelatihan / Training</option>';
       }
 
-      // Reset semua tampilan seksi form
       document.querySelectorAll('.form-section').forEach(el => el.classList.add('hidden'));
       document.getElementById('mainFormFields').classList.add('hidden');
     }
@@ -255,68 +271,51 @@
     }
 
     function loadNama() {
-      let selectedStore = document.getElementById('store').value;
-      let namaDropdown = document.getElementById('nama');
-      namaDropdown.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      let store = document.getElementById('store').value;
+      let namaDrop = document.getElementById('nama');
+      namaDrop.innerHTML = '<option value="">-- Pilih Nama --</option>';
       document.getElementById('jabatan').value = "";
-      
-      let filteredData = rawData.filter(row => row[0] === selectedStore);
-      filteredData.forEach(row => {
-        namaDropdown.innerHTML += `<option value="${row[1]}">${row[1]}</option>`;
-      });
+      rawData.filter(row => row[0] === store).forEach(row => namaDrop.innerHTML += `<option value="${row[1]}">${row[1]}</option>`);
     }
 
     function loadJabatan() {
-      let selectedStore = document.getElementById('store').value;
-      let selectedNama = document.getElementById('nama').value;
-      let person = rawData.find(row => row[0] === selectedStore && row[1] === selectedNama);
+      let store = document.getElementById('store').value;
+      let nama = document.getElementById('nama').value;
+      let person = rawData.find(row => row[0] === store && row[1] === nama);
       if(person) document.getElementById('jabatan').value = person[2];
     }
 
     function toggleFormSections() {
       let type = document.getElementById('formType').value;
       document.getElementById('mainFormFields').classList.toggle('hidden', type === "");
-      
-      // Sembunyikan semua dulu
       document.querySelectorAll('.form-section').forEach(el => el.classList.add('hidden'));
 
-      // Tampilkan sesuai pilihan
       if (type === "Big Order") document.getElementById('sales_bigOrderFields').classList.remove('hidden');
       else if (type === "Event") document.getElementById('sales_eventFields').classList.remove('hidden');
       else if (type === "Pengendalian Cogs") document.getElementById('cogs_cogsFields').classList.remove('hidden');
       else if (type === "Pengendalian Waste") document.getElementById('cogs_wasteFields').classList.remove('hidden');
       else if (type === "Pengendalian Stok Opname") document.getElementById('cogs_soFields').classList.remove('hidden');
+      else if (type === "Pelatihan / Training") document.getElementById('pengembangan_fields').classList.remove('hidden');
     }
 
     function toggleLainnya(selectId, divId) {
       let val = document.getElementById(selectId).value;
       document.getElementById(divId).classList.toggle('hidden', val !== "Lainnya");
     }
-    // Utilitas mengubah File menjadi Base64 string dengan Kompresi Gambar
+
+    // Kompresi Gambar
     async function fileToBase64(file) {
       if(!file) return null;
-      
-      // Opsi kompresi: Maksimal 1MB, lebar maksimal 1920px
-      const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true
-      };
-      
+      const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
       try {
-        // Proses kompresi
         const compressedFile = await imageCompression(file, options);
-        
-        // Ubah hasil kompresi ke Base64
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.readAsDataURL(compressedFile);
           reader.onload = () => resolve({ base64: reader.result, name: compressedFile.name, mime: compressedFile.type });
           reader.onerror = error => reject(error);
         });
-      } catch (error) {
-        console.error("Gagal kompresi gambar:", error);
-        // Jika gagal kompresi, gunakan file asli
+      } catch (e) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.readAsDataURL(file);
@@ -333,11 +332,13 @@
         return;
       }
 
-      // Validasi File Upload (Khusus COGS Wajib)
       let filesToUpload = {};
-      if (currentCategory === 'cogs') {
+      
+      // Validasi Foto WAJIB untuk COGS dan PENGEMBANGAN
+      if (currentCategory === 'cogs' || currentCategory === 'pengembangan') {
         let fileInput;
-        if (type === 'Pengendalian Cogs') fileInput = document.getElementById('fotoCogs').files[0];
+        if (currentCategory === 'pengembangan') fileInput = document.getElementById('fotoPengembangan').files[0];
+        else if (type === 'Pengendalian Cogs') fileInput = document.getElementById('fotoCogs').files[0];
         else if (type === 'Pengendalian Waste') fileInput = document.getElementById('fotoWaste').files[0];
         else fileInput = document.getElementById('fotoOpname').files[0];
 
@@ -347,20 +348,13 @@
         }
         let fData = await fileToBase64(fileInput);
         filesToUpload = { fileBase64: fData.base64, fileName: fData.name, fileMime: fData.mime };
-      } else {
-        // Sales Category bisa 2 File
-        let file1, file2;
-        if(type === 'Big Order') {
-          file1 = document.getElementById('boFile1').files[0];
-          file2 = document.getElementById('boFile2').files[0];
-        } else {
-          file1 = document.getElementById('evFile1').files[0];
-          file2 = document.getElementById('evFile2').files[0];
-        }
-        
+      } 
+      // Foto Opsi Ganda untuk SALES
+      else {
+        let file1 = type === 'Big Order' ? document.getElementById('boFile1').files[0] : document.getElementById('evFile1').files[0];
+        let file2 = type === 'Big Order' ? document.getElementById('boFile2').files[0] : document.getElementById('evFile2').files[0];
         let f1Data = await fileToBase64(file1);
         let f2Data = await fileToBase64(file2);
-        
         filesToUpload = {
           file1Base64: f1Data ? f1Data.base64 : "", file1Name: f1Data ? f1Data.name : "", file1Mime: f1Data ? f1Data.mime : "",
           file2Base64: f2Data ? f2Data.base64 : "", file2Name: f2Data ? f2Data.name : "", file2Mime: f2Data ? f2Data.mime : ""
@@ -368,70 +362,51 @@
       }
 
       Swal.fire({
-        title: 'Mengirim Laporan...',
-        text: 'Mohon tunggu, memproses formulir ke server.',
-        allowOutsideClick: false,
-        didOpen: () => { Swal.showLoading() }
+        title: 'Mengirim Laporan...', text: 'Mohon tunggu, memproses ke server.',
+        allowOutsideClick: false, didOpen: () => { Swal.showLoading() }
       });
 
-      // Kumpulkan data text dari form
-      const formElement = document.getElementById('unifiedForm');
-      const formData = new FormData(formElement);
+      const formData = new FormData(document.getElementById('unifiedForm'));
       const dataObj = Object.fromEntries(formData.entries());
-      
-      // Gabungkan info kategori dan file base64
-      const payloadData = {
-        formCategory: currentCategory,
-        ...dataObj,
-        ...filesToUpload
-      };
+      const payloadData = { formCategory: currentCategory, ...dataObj, ...filesToUpload };
 
-      // POST Request ke Apps Script dengan mode 'no-cors' untuk hindari block jika redirect
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8", // text/plain lebih aman dari CORS
-          },
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payloadData),
         });
-        
         const result = await response.json();
-        if(result.status === 'success') {
-          handleSuccess(result);
-        } else {
-          Swal.fire('Gagal', 'Sistem Gagal: ' + result.message, 'error');
-        }
+        if(result.status === 'success') handleSuccess(result);
+        else Swal.fire('Gagal', 'Sistem Gagal: ' + result.message, 'error');
       } catch (err) {
-        Swal.fire('Error', 'Gagal menghubungi server. Pastikan URL Web App benar. Error: ' + err.message, 'error');
+        Swal.fire('Error', 'Gagal menghubungi server.', 'error');
       }
     }
 
     function handleSuccess(response) {
-      Swal.fire('Berhasil!', 'Data telah terkirim dan disimpan.', 'success');
+      Swal.fire('Berhasil!', 'Data telah terkirim.', 'success');
       document.getElementById('unifiedForm').classList.add('hidden');
       document.getElementById('shareSection').classList.remove('hidden');
       
       let waText = "";
-      if(currentCategory === 'sales') {
-        waText = generateWaSales(response);
-      } else {
-        waText = generateWaCogs(response);
-      }
+      if (currentCategory === 'sales') waText = generateWaSales(response);
+      else if (currentCategory === 'cogs') waText = generateWaCogs(response);
+      else waText = generateWaPengembangan(response);
       
-      let waUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
-      document.getElementById('btnShareWa').href = waUrl;
+      document.getElementById('btnShareWa').href = `https://wa.me/?text=${encodeURIComponent(waText)}`;
     }
 
     function generateWaSales(response) {
-      let waText = `*REPORT PROGRESS SALES SM*\n\n*Tipe:* ${response.type}\n*Store:* ${response.data.store}\n*Nama:* ${response.data.nama}\n*Jabatan:* ${response.data.jabatan}\n\n`;
-      let lampiran1 = response.urlBukti1 ? `\n*Link Bukti 1:* ${response.urlBukti1}` : "";
-      let lampiran2 = response.urlBukti2 ? `\n*Link Bukti 2:* ${response.urlBukti2}` : "";
+      let d = response.data;
+      let waText = `*REPORT PROGRESS SALES SM*\n\n*Tipe:* ${response.type}\n*Store:* ${d.store}\n*Nama:* ${d.nama}\n*Jabatan:* ${d.jabatan}\n\n`;
+      let l1 = response.urlBukti1 ? `\n*Link Bukti 1:* ${response.urlBukti1}` : "";
+      let l2 = response.urlBukti2 ? `\n*Link Bukti 2:* ${response.urlBukti2}` : "";
 
       if(response.type === 'Big Order') {
-        waText += `*Nama Customer:* ${response.data.boNamaCust}\n*WA Customer:* ${response.data.boWaCust}\n*Sumber Prospek:* ${response.detail1}\n*Tanggal Big Order:* ${response.dateBO}\n*Pesanan Customer:* ${response.data.boPesanan}\n*Big order untuk:* ${response.data.boPic}\n${lampiran1}${lampiran2}`;
+        waText += `*Nama Customer:* ${d.boNamaCust}\n*WA Customer:* ${d.boWaCust}\n*Sumber:* ${response.detail1}\n*Tanggal:* ${response.dateBO}\n*Pesanan:* ${d.boPesanan}\n*Pesan Untuk:* ${d.boPic}\n${l1}${l2}`;
       } else {
-        waText += `*Nama Instansi:* ${response.data.evInstansi}\n*Jenis Event:* ${response.detail1}\n*Estimasi Peserta:* ${response.data.evPeserta}\n*Sales Event:* Rp ${response.data.evSales}\n*PIC SM:* ${response.data.evPic}\n${lampiran1}${lampiran2}`;
+        waText += `*Instansi:* ${d.evInstansi}\n*Jenis:* ${response.detail1}\n*Peserta:* ${d.evPeserta}\n*Sales:* Rp ${d.evSales}\n*Pesan Untuk:* ${d.evPic}\n${l1}${l2}`;
       }
       return waText;
     }
@@ -439,29 +414,27 @@
     function generateWaCogs(response) {
       let d = response.data;
       let waText = `*REPORT PROGRESS ${d.formType.toUpperCase()}*\n\n*Asal Store:* ${d.store}\n*Nama:* ${d.nama}\n*Jabatan:* ${d.jabatan}\n\n`;
+      if (d.formType === 'Pengendalian Cogs') waText += `*COGS Sekarang:* ${d.cogsSekarang}\n*GAP COGS Actual:* ${d.gapCogs}\n*Penyebab COGS > 55%:*\n${d.penyebabCogs}\n\n*Tindakan Perbaikan:*\n${d.tindakanCogs}`;
+      else if (d.formType === 'Pengendalian Waste') waText += `*Waste vs Sales:* ${d.persenWaste}\n*Waste Terbesar:* ${d.wasteBesar}\n*Sebab Utama:*\n${d.sebabWaste}\n\n*Tindakan Perbaikan:*\n${d.tindakanWaste}`;
+      else waText += `*Selisih SO:* ${d.persenSelisih}\n*Penyebab Selisih:*\n${d.sebabSelisih}\n\n*Tindakan Perbaikan:*\n${d.tindakanOpname}`;
       
-      if (d.formType === 'Pengendalian Cogs') {
-        waText += `*COGS Sekarang:* ${d.cogsSekarang}\n*GAP COGS Actual:* ${d.gapCogs}\n*Penyebab COGS > 55%:*\n${d.penyebabCogs}\n\n*Tindakan Perbaikan:*\n${d.tindakanCogs}`;
-      } else if (d.formType === 'Pengendalian Waste') {
-        waText += `*Persentase Waste vs Sales:* ${d.persenWaste}\n*Waste Terbesar:* ${d.wasteBesar}\n*Sebab Utama Waste:*\n${d.sebabWaste}\n\n*Tindakan Perbaikan:*\n${d.tindakanWaste}`;
-      } else if (d.formType === 'Pengendalian Stok Opname') {
-        waText += `*Persentase Selisih SO:* ${d.persenSelisih}\n*Penyebab SO Selisih:*\n${d.sebabSelisih}\n\n*Tindakan Perbaikan:*\n${d.tindakanOpname}`;
-      }
+      if(response.urlFoto) waText += `\n\n*Link Bukti:* ${response.urlFoto}`;
+      return waText;
+    }
+
+    function generateWaPengembangan(response) {
+      let d = response.data;
+      let waText = `*REPORT PENGEMBANGAN DIRI*\n\n*Asal Store:* ${d.store}\n*Nama:* ${d.nama}\n*Jabatan:* ${d.jabatan}\n\n`;
+      waText += `*Training SOP:* ${d.trainingSop}\n*Training Siapa:* ${d.trainingSiapa}\n*Hasil Training:*\n${d.hasilTraining}`;
+      if (response.urlFoto) waText += `\n\n*Link Bukti:* ${response.urlFoto}`;
       return waText;
     }
   </script>
-  <!-- Tambahkan script pendaftaran Service Worker ini -->
+
+  <!-- Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(registration => {
-            console.log('ServiceWorker registered with scope:', registration.scope);
-          })
-          .catch(err => {
-            console.log('ServiceWorker registration failed:', err);
-          });
-      });
+      window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.error(err)); });
     }
   </script>
 </body>
