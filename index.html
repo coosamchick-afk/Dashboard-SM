@@ -16,26 +16,67 @@
     .card { border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
     .hidden { display: none !important; }
     .menu-btn { height: 100px; font-size: 1.2rem; font-weight: bold; border-radius: 15px; }
+    .menu-card {
+  background: #ffffff;
+  transition: all 0.2s ease-in-out;
+  border-left: 5px solid transparent;
+}
+.menu-card:active {
+  transform: scale(0.98);
+  background: #f8f9fa;
+}
+.menu-card.marketing { border-left-color: #0d6efd; }
+.menu-card.operasional { border-left-color: #ffc107; }
+.icon-box {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
   </style>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
   <div class="container mx-auto" style="max-width: 650px;">
     
     <!-- HALAMAN PEMILIHAN MENU -->
-    <div id="homeMenu">
-      <h3 class="text-center mb-4 text-primary fw-bold">Report Progres SM/MT</h3>
-      <div class="row">
-        <div class="col-6">
-          <button class="btn btn-primary w-100 menu-btn shadow-sm" onclick="showForm('sales')">
-            Report<br>Progress Marketing
-          </button>
-        </div>
-        <div class="col-6">
-          <button class="btn btn-warning w-100 menu-btn shadow-sm text-dark" onclick="showForm('cogs')">
-            Report<br>Progress Operatioanal
-          </button>
-        </div>
+    <div id="homeMenu" class="py-3">
+      <div class="text-center mb-5 mt-3">
+        <h2 class="text-primary fw-bold mb-2">Dashboard SM/MT</h2>
+        <p class="text-muted">Pilih kategori laporan yang ingin Anda isi hari ini</p>
+      </div>
+
+      <div class="d-flex flex-column gap-3">
+        <!-- Menu Marketing -->
+        <button class="btn w-100 text-start p-3 shadow-sm rounded-4 menu-card marketing" onclick="showForm('sales')">
+          <div class="d-flex align-items-center">
+            <div class="icon-box bg-primary text-white rounded-circle me-3 shadow-sm">
+              <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold mb-1 text-dark">Progress Marketing</h5>
+              <small class="text-muted">Laporan Big Order & Event</small>
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted"></i>
+          </div>
+        </button>
+
+        <!-- Menu Operasional -->
+        <button class="btn w-100 text-start p-3 shadow-sm rounded-4 menu-card operasional" onclick="showForm('cogs')">
+          <div class="d-flex align-items-center">
+            <div class="icon-box bg-warning text-dark rounded-circle me-3 shadow-sm">
+              <i class="bi bi-box-seam"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold mb-1 text-dark">Progress Operasional</h5>
+              <small class="text-muted">Laporan COGS, Waste & Stock Opname</small>
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted"></i>
+          </div>
+        </button>
       </div>
     </div>
 
