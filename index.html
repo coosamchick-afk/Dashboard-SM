@@ -429,7 +429,7 @@
       let lampiran2 = response.urlBukti2 ? `\n*Link Bukti 2:* ${response.urlBukti2}` : "";
 
       if(response.type === 'Big Order') {
-        waText += `*Nama Customer:* ${response.data.boNamaCust}\n*WA Customer:* ${response.data.boWaCust}\n*Sumber Prospek:* ${response.detail1}\n*Tanggal Big Order:* ${response.dateBO}\n*Pesanan Customer:* ${response.data.boPesanan}\n*PIC SM:* ${response.data.boPic}\n${lampiran1}${lampiran2}`;
+        waText += `*Nama Customer:* ${response.data.boNamaCust}\n*WA Customer:* ${response.data.boWaCust}\n*Sumber Prospek:* ${response.detail1}\n*Tanggal Big Order:* ${response.dateBO}\n*Pesanan Customer:* ${response.data.boPesanan}\n*Big order untuk:* ${response.data.boPic}\n${lampiran1}${lampiran2}`;
       } else {
         waText += `*Nama Instansi:* ${response.data.evInstansi}\n*Jenis Event:* ${response.detail1}\n*Estimasi Peserta:* ${response.data.evPeserta}\n*Sales Event:* Rp ${response.data.evSales}\n*PIC SM:* ${response.data.evPic}\n${lampiran1}${lampiran2}`;
       }
