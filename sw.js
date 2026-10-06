@@ -1,4 +1,4 @@
-const CACHE_NAME = "sm-app-v3";
+const CACHE_NAME = "sm-app-v6";
 const urlsToCache = [
   "./",
   "./index.html",
