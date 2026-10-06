@@ -314,7 +314,7 @@
 
       if (!selectedNama || !kpiDataRaw) return;
 
-      // Cari Data SM di array Users (Nama ada di index 0 karena range mulai dari B)
+      // Cari Data SM di array Users
       let userData = kpiDataRaw.users.find(row => row[0] === selectedNama);
       
       if (!userData) {
@@ -322,19 +322,26 @@
         return;
       }
 
+      // Wadah penampung HTML tiap kategori
+      let htmlMarketing = "";
+      let htmlOperational = "";
+      let htmlPengembangan = "";
+      let htmlFinance = "";
+      let htmlTotal = "";
+
       // Loop melalui setiap kolom KPI (Mulai index 1 agar 'Nama' dilewati)
       for (let i = 1; i < kpiDataRaw.headers.length; i++) {
         let title = kpiDataRaw.headers[i];
+        if (!title) continue; // Skip jika header kosong
+
         let targetText = kpiDataRaw.targets[i];
         let achieveText = userData[i];
         
-        if (!title) continue; // Skip jika header kosong
-
         let targetNum = parseNumber(targetText);
         let achieveNum = parseNumber(achieveText);
         let percentage = 0;
 
-        // Aturan Khusus: Jika target 0 (seperti komplain), maka jika 0 tercapai = 100%, jika > 0 = 0%
+        // Aturan Khusus Target 0 (seperti komplain)
         if (targetNum === 0 && title.toLowerCase().includes("zero")) {
           percentage = (achieveNum <= 0) ? 100 : 0;
         } else if (targetNum > 0) {
@@ -349,25 +356,81 @@
         if (percentage >= 80) colorClass = "bg-success";
         else if (percentage >= 50) colorClass = "bg-warning";
 
-        // Template HTML untuk setiap Card KPI
+        let titleLower = title.toLowerCase();
+
+        // 1. DESAIN KHUSUS TOTAL NILAI (FULL WIDTH & BEDA WARNA)
+        if (titleLower.includes("total nilai")) {
+          htmlTotal = `
+            <div class="col-12 mt-4 mb-2">
+              <div class="card p-4 border-0 shadow" style="background: linear-gradient(135deg, #6f42c1, #0d6efd); color: white; border-radius: 15px;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h5 class="fw-bold mb-0 text-white"><i class="bi bi-trophy-fill text-warning me-2"></i> ${title}</h5>
+                  <h3 class="fw-bold mb-0 text-white">${achieveText || '0'} <span style="font-size: 1rem; opacity: 0.8;">/ ${targetText || '0'}</span></h3>
+                </div>
+                <div class="progress mt-3" style="height: 12px; background-color: rgba(255,255,255,0.3);">
+                  <div class="progress-bar progress-bar-striped progress-bar-animated ${colorClass}" role="progressbar" style="width: ${percentage}%"></div>
+                </div>
+              </div>
+            </div>
+          `;
+          continue; // Lewati ke iterasi berikutnya, jangan buat card reguler
+        }
+
+        // 2. TEMPLATE CARD REGULER UNTUK KPI LAIN
         let cardHTML = `
           <div class="col-6 col-md-4">
-            <div class="card p-3 h-100 border-0 shadow-sm" style="border: 1px solid #f1f3f5;">
-              <div class="kpi-title mb-2">${title}</div>
+            <div class="card p-3 h-100 border-0 shadow-sm" style="border: 1px solid #f1f3f5; border-radius: 12px;">
+              <div class="kpi-title mb-2" style="font-size: 0.8rem; font-weight: 700; color: #495057; height: 38px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${title}</div>
               <div class="d-flex justify-content-between kpi-val mb-2">
-                <span class="fw-bold text-dark">${achieveText || '0'}</span>
-                <span class="text-muted">Target: ${targetText || '0'}</span>
+                <span class="fw-bold text-dark" style="font-size: 0.95rem;">${achieveText || '0'}</span>
+                <span class="text-muted" style="font-size: 0.75rem;">Trgt: ${targetText || '0'}</span>
               </div>
-              <div class="progress">
-                <div class="progress-bar progress-bar-striped progress-bar-animated ${colorClass}" role="progressbar" style="width: ${percentage}%"></div>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar ${colorClass}" role="progressbar" style="width: ${percentage}%"></div>
               </div>
             </div>
           </div>
         `;
-        container.innerHTML += cardHTML;
-      }
-    }
 
+        // 3. PEMBAGIAN KATEGORI (BERDASARKAN KATA KUNCI HEADER)
+        if (titleLower.includes("big order") || titleLower.includes("event") || titleLower.includes("target sales") || titleLower.includes("transaksi do")) {
+          htmlMarketing += cardHTML;
+        } 
+        else if (titleLower.includes("sertifikasi") || titleLower.includes("skill trainer") || titleLower.includes("respect team")) {
+          htmlPengembangan += cardHTML;
+        } 
+        else if (titleLower.includes("tunai") || titleLower.includes("calculator") || titleLower.includes("transfer realtime") || titleLower.includes("jam 17.00") || titleLower.includes("nt akurat")) {
+          htmlFinance += cardHTML;
+        } 
+        else {
+          // Default ke Operational jika tidak ada di atas (SOP, WOW Service, COGS, Stok Opname)
+          htmlOperational += cardHTML;
+        }
+      }
+
+      // 4. SUSUN DAN GABUNGKAN SEMUA KATEGORI
+      let finalHTML = "";
+      
+      if (htmlOperational) {
+        finalHTML += `<div class="col-12 mt-3"><h6 class="fw-bold text-warning mb-2 border-bottom pb-2"><i class="bi bi-box-seam me-2"></i> OPERATIONAL</h6></div>` + htmlOperational;
+      }
+      if (htmlMarketing) {
+        finalHTML += `<div class="col-12 mt-4"><h6 class="fw-bold text-primary mb-2 border-bottom pb-2"><i class="bi bi-graph-up-arrow me-2"></i> MARKETING</h6></div>` + htmlMarketing;
+      }
+      if (htmlPengembangan) {
+        finalHTML += `<div class="col-12 mt-4"><h6 class="fw-bold text-success mb-2 border-bottom pb-2"><i class="bi bi-person-lines-fill me-2"></i> PENGEMBANGAN DIRI</h6></div>` + htmlPengembangan;
+      }
+      if (htmlFinance) {
+        finalHTML += `<div class="col-12 mt-4"><h6 class="fw-bold text-info mb-2 border-bottom pb-2" style="color: #0dcaf0;"><i class="bi bi-cash-coin me-2"></i> FINANCE</h6></div>` + htmlFinance;
+      }
+      
+      // Letakkan Total Nilai di paling bawah
+      if (htmlTotal) {
+        finalHTML += htmlTotal;
+      }
+
+      container.innerHTML = finalHTML;
+    }
     /* =======================================================
        LOGIKA FORM & LAINNYA
        ======================================================= */
