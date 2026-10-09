@@ -332,17 +332,36 @@
       // Loop melalui setiap kolom KPI (Mulai index 1 agar 'Nama' dilewati)
       for (let i = 1; i < kpiDataRaw.headers.length; i++) {
         let title = kpiDataRaw.headers[i];
-        if (!title) continue; // Skip jika header kosong
+        
+        // Jika header kosong (karena ini adalah kolom merge dari persentase sebelahnya), maka lewati
+        if (!title) continue; 
 
+        // Bersihkan spasi dan enter
+        let titleLower = title.toLowerCase().replace(/\s+/g, ' ');
+        
         let targetText = kpiDataRaw.targets[i];
         let achieveText = userData[i];
         
+        // Cek apakah ini kolom dengan 2 Target (COGS atau Selisih Stok Opname)
+        let isDualTarget = false;
+        let targetText2 = "";
+        let achieveText2 = "";
+
+        if (titleLower.includes("cogs") || titleLower.includes("selisih stok opname")) {
+            isDualTarget = true;
+            // Tarik data persentase dari kolom sebelahnya (i + 1)
+            if (i + 1 < kpiDataRaw.headers.length) {
+                targetText2 = kpiDataRaw.targets[i + 1];
+                achieveText2 = userData[i + 1];
+            }
+        }
+
         let targetNum = parseNumber(targetText);
         let achieveNum = parseNumber(achieveText);
         let percentage = 0;
 
         // Aturan Khusus Target 0 (seperti komplain)
-        if (targetNum === 0 && title.toLowerCase().includes("zero")) {
+        if (targetNum === 0 && titleLower.includes("zero")) {
           percentage = (achieveNum <= 0) ? 100 : 0;
         } else if (targetNum > 0) {
           percentage = (achieveNum / targetNum) * 100;
@@ -356,9 +375,9 @@
         if (percentage >= 80) colorClass = "bg-success";
         else if (percentage >= 50) colorClass = "bg-warning";
 
-        let titleLower = title.toLowerCase();
+        let cardHTML = "";
 
-        // 1. DESAIN KHUSUS TOTAL NILAI (FULL WIDTH & BEDA WARNA)
+        // 1. DESAIN KHUSUS TOTAL NILAI (FULL WIDTH)
         if (titleLower.includes("total nilai")) {
           htmlTotal = `
             <div class="col-12 mt-4 mb-2">
@@ -373,26 +392,54 @@
               </div>
             </div>
           `;
-          continue; // Lewati ke iterasi berikutnya, jangan buat card reguler
+          continue; 
         }
 
-        // 2. TEMPLATE CARD REGULER UNTUK KPI LAIN
-        let cardHTML = `
-          <div class="col-6 col-md-4">
-            <div class="card p-3 h-100 border-0 shadow-sm" style="border: 1px solid #f1f3f5; border-radius: 12px;">
-              <div class="kpi-title mb-2" style="font-size: 0.8rem; font-weight: 700; color: #495057; height: 38px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${title}</div>
-              <div class="d-flex justify-content-between kpi-val mb-2">
-                <span class="fw-bold text-dark" style="font-size: 0.95rem;">${achieveText || '0'}</span>
-                <span class="text-muted" style="font-size: 0.75rem;">Trgt: ${targetText || '0'}</span>
-              </div>
-              <div class="progress" style="height: 8px;">
-                <div class="progress-bar ${colorClass}" role="progressbar" style="width: ${percentage}%"></div>
+        // 2. TEMPLATE CARD DENGAN 2 TARGET (COGS & SELISIH STOK)
+        if (isDualTarget) {
+          cardHTML = `
+            <div class="col-6 col-md-4">
+              <div class="card p-3 h-100 border-0 shadow-sm" style="border: 1px solid #f1f3f5; border-radius: 12px;">
+                <div class="kpi-title mb-2" style="font-size: 0.8rem; font-weight: 700; color: #495057; height: 38px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${title}</div>
+                
+                <!-- Target 1: Poin Penilaian -->
+                <div class="d-flex justify-content-between kpi-val mb-1">
+                  <span class="fw-bold text-dark" style="font-size: 0.95rem;">${achieveText || '0'}</span>
+                  <span class="text-muted" style="font-size: 0.75rem;">Trgt: ${targetText || '0'}</span>
+                </div>
+                
+                <!-- Target 2: Persentase Aktual (Desain box kecil) -->
+                <div class="d-flex justify-content-between kpi-val mb-2" style="background: #e9ecef; padding: 2px 6px; border-radius: 4px;">
+                  <span class="fw-bold text-primary" style="font-size: 0.85rem;">Akt: ${achieveText2 || '0'}</span>
+                  <span class="text-muted" style="font-size: 0.75rem;">Trgt: ${targetText2 || '0'}</span>
+                </div>
+                
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar ${colorClass}" role="progressbar" style="width: ${percentage}%"></div>
+                </div>
               </div>
             </div>
-          </div>
-        `;
+          `;
+        } 
+        // 3. TEMPLATE CARD REGULER
+        else {
+          cardHTML = `
+            <div class="col-6 col-md-4">
+              <div class="card p-3 h-100 border-0 shadow-sm" style="border: 1px solid #f1f3f5; border-radius: 12px;">
+                <div class="kpi-title mb-2" style="font-size: 0.8rem; font-weight: 700; color: #495057; height: 38px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${title}</div>
+                <div class="d-flex justify-content-between kpi-val mb-2">
+                  <span class="fw-bold text-dark" style="font-size: 0.95rem;">${achieveText || '0'}</span>
+                  <span class="text-muted" style="font-size: 0.75rem;">Trgt: ${targetText || '0'}</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar ${colorClass}" role="progressbar" style="width: ${percentage}%"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
 
-        // 3. PEMBAGIAN KATEGORI (BERDASARKAN KATA KUNCI HEADER)
+        // 4. PEMBAGIAN KATEGORI (BERDASARKAN KATA KUNCI HEADER)
         if (titleLower.includes("big order") || titleLower.includes("event") || titleLower.includes("target sales") || titleLower.includes("transaksi do")) {
           htmlMarketing += cardHTML;
         } 
@@ -403,12 +450,12 @@
           htmlFinance += cardHTML;
         } 
         else {
-          // Default ke Operational jika tidak ada di atas (SOP, WOW Service, COGS, Stok Opname)
+          // Default ke Operational
           htmlOperational += cardHTML;
         }
       }
 
-      // 4. SUSUN DAN GABUNGKAN SEMUA KATEGORI
+      // 5. SUSUN DAN GABUNGKAN SEMUA KATEGORI
       let finalHTML = "";
       
       if (htmlOperational) {
@@ -424,7 +471,6 @@
         finalHTML += `<div class="col-12 mt-4"><h6 class="fw-bold text-info mb-2 border-bottom pb-2" style="color: #0dcaf0;"><i class="bi bi-cash-coin me-2"></i> FINANCE</h6></div>` + htmlFinance;
       }
       
-      // Letakkan Total Nilai di paling bawah
       if (htmlTotal) {
         finalHTML += htmlTotal;
       }
