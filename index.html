@@ -333,7 +333,7 @@
       for (let i = 1; i < kpiDataRaw.headers.length; i++) {
         let title = kpiDataRaw.headers[i];
         
-        // Jika header kosong (karena ini adalah kolom merge dari persentase sebelahnya), maka lewati
+        // Lewati jika header kosong
         if (!title) continue; 
 
         // Bersihkan spasi dan enter
@@ -349,7 +349,6 @@
 
         if (titleLower.includes("cogs") || titleLower.includes("selisih stok opname")) {
             isDualTarget = true;
-            // Tarik data persentase dari kolom sebelahnya (i + 1)
             if (i + 1 < kpiDataRaw.headers.length) {
                 targetText2 = kpiDataRaw.targets[i + 1];
                 achieveText2 = userData[i + 1];
@@ -360,24 +359,55 @@
         let achieveNum = parseNumber(achieveText);
         let percentage = 0;
 
-        // Aturan Khusus Target 0 (seperti komplain)
+        // Hitung Persentase Default
         if (targetNum === 0 && titleLower.includes("zero")) {
           percentage = (achieveNum <= 0) ? 100 : 0;
         } else if (targetNum > 0) {
           percentage = (achieveNum / targetNum) * 100;
         }
 
-        if (percentage > 100) percentage = 100; // Cap visual bar di 100%
+        if (percentage > 100) percentage = 100;
         if (percentage < 0) percentage = 0;
 
-        // Penentuan Warna Progress Bar
+        // Warna Default (Lebih besar lebih baik)
         let colorClass = "bg-danger";
         if (percentage >= 80) colorClass = "bg-success";
         else if (percentage >= 50) colorClass = "bg-warning";
 
+
+        // =========================================================
+        // ATURAN KHUSUS "LOWER IS BETTER" (TIDAK BOLEH LEBIH DARI TARGET)
+        // =========================================================
+        
+        // 1. Khusus "Memastikan Operasional" (Komplain)
+        if (titleLower.includes("memastikan operasional")) {
+          if (achieveNum > targetNum) {
+            colorClass = "bg-danger"; // Merah jika ada komplain (> 0)
+            percentage = 100; // Tampilkan bar penuh warna merah agar mencolok
+          } else {
+            colorClass = "bg-success"; // Hijau jika 0 komplain
+            percentage = 100;
+          }
+        } 
+        // 2. Khusus "COGS" dan "Selisih Stok Opname"
+        else if (isDualTarget) {
+          let actualVal2 = parseNumber(achieveText2);
+          let targetVal2 = parseNumber(targetText2);
+          
+          if (actualVal2 > targetVal2) {
+            colorClass = "bg-danger"; // Merah jika persentase aktual > target (misal 56% > 55%)
+            percentage = 100; 
+          } else {
+            colorClass = "bg-success"; // Hijau jika di bawah atau sama dengan target
+            percentage = 100;
+          }
+        }
+        // =========================================================
+
+
         let cardHTML = "";
 
-        // 1. DESAIN KHUSUS TOTAL NILAI (FULL WIDTH)
+        // DESAIN KHUSUS TOTAL NILAI (FULL WIDTH)
         if (titleLower.includes("total nilai")) {
           htmlTotal = `
             <div class="col-12 mt-4 mb-2">
@@ -395,20 +425,18 @@
           continue; 
         }
 
-        // 2. TEMPLATE CARD DENGAN 2 TARGET (COGS & SELISIH STOK)
+        // TEMPLATE CARD DENGAN 2 TARGET (COGS & SELISIH STOK)
         if (isDualTarget) {
           cardHTML = `
             <div class="col-6 col-md-4">
               <div class="card p-3 h-100 border-0 shadow-sm" style="border: 1px solid #f1f3f5; border-radius: 12px;">
                 <div class="kpi-title mb-2" style="font-size: 0.8rem; font-weight: 700; color: #495057; height: 38px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${title}</div>
                 
-                <!-- Target 1: Poin Penilaian -->
                 <div class="d-flex justify-content-between kpi-val mb-1">
-                  <span class="fw-bold text-dark" style="font-size: 0.95rem;">${achieveText || '0'}</span>
+                  <span class="fw-bold text-dark" style="font-size: 0.95rem;">Poin: ${achieveText || '0'}</span>
                   <span class="text-muted" style="font-size: 0.75rem;">Trgt: ${targetText || '0'}</span>
                 </div>
                 
-                <!-- Target 2: Persentase Aktual (Desain box kecil) -->
                 <div class="d-flex justify-content-between kpi-val mb-2" style="background: #e9ecef; padding: 2px 6px; border-radius: 4px;">
                   <span class="fw-bold text-primary" style="font-size: 0.85rem;">Akt: ${achieveText2 || '0'}</span>
                   <span class="text-muted" style="font-size: 0.75rem;">Trgt: ${targetText2 || '0'}</span>
@@ -421,7 +449,7 @@
             </div>
           `;
         } 
-        // 3. TEMPLATE CARD REGULER
+        // TEMPLATE CARD REGULER
         else {
           cardHTML = `
             <div class="col-6 col-md-4">
@@ -439,7 +467,7 @@
           `;
         }
 
-        // 4. PEMBAGIAN KATEGORI (BERDASARKAN KATA KUNCI HEADER)
+        // PEMBAGIAN KATEGORI
         if (titleLower.includes("big order") || titleLower.includes("event") || titleLower.includes("target sales") || titleLower.includes("transaksi do")) {
           htmlMarketing += cardHTML;
         } 
@@ -450,12 +478,11 @@
           htmlFinance += cardHTML;
         } 
         else {
-          // Default ke Operational
           htmlOperational += cardHTML;
         }
       }
 
-      // 5. SUSUN DAN GABUNGKAN SEMUA KATEGORI
+      // SUSUN DAN GABUNGKAN SEMUA KATEGORI
       let finalHTML = "";
       
       if (htmlOperational) {
@@ -470,7 +497,6 @@
       if (htmlFinance) {
         finalHTML += `<div class="col-12 mt-4"><h6 class="fw-bold text-info mb-2 border-bottom pb-2" style="color: #0dcaf0;"><i class="bi bi-cash-coin me-2"></i> FINANCE</h6></div>` + htmlFinance;
       }
-      
       if (htmlTotal) {
         finalHTML += htmlTotal;
       }
